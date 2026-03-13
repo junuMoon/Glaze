@@ -8,36 +8,39 @@ final class BreakOverlayManager {
     func show(controller: GlazeController) {
         guard windows.isEmpty else { return }
 
-        windows = NSScreen.screens.map { screen in
-            let window = BreakOverlayWindow(
-                contentRect: screen.frame,
-                styleMask: [.borderless],
-                backing: .buffered,
-                defer: false,
-                screen: screen
-            )
-            window.isOpaque = false
-            window.backgroundColor = .clear
-            window.level = .screenSaver
-            window.collectionBehavior = [
-                .canJoinAllSpaces,
-                .fullScreenAuxiliary,
-                .ignoresCycle
-            ]
-            window.ignoresMouseEvents = false
-            window.titleVisibility = .hidden
-            window.titlebarAppearsTransparent = true
-            window.isMovable = false
-            window.contentView = NSHostingView(rootView: BreakOverlayView(controller: controller))
-            window.makeKeyAndOrderFront(nil)
-            window.orderFrontRegardless()
-            return window
-        }
+        windows = NSScreen.screens.map { makeWindow(for: $0, controller: controller) }
     }
 
     func hide() {
-        windows.forEach { $0.close() }
+        windows.forEach { $0.orderOut(nil) }
         windows.removeAll()
+    }
+
+    private func makeWindow(for screen: NSScreen, controller: GlazeController) -> BreakOverlayWindow {
+        let window = BreakOverlayWindow(
+            contentRect: NSRect(origin: .zero, size: screen.frame.size),
+            styleMask: [.borderless],
+            backing: .buffered,
+            defer: false
+        )
+        window.isOpaque = false
+        window.backgroundColor = .clear
+        window.level = .screenSaver
+        window.collectionBehavior = [
+            .canJoinAllSpaces,
+            .fullScreenAuxiliary,
+            .ignoresCycle
+        ]
+        window.ignoresMouseEvents = false
+        window.isReleasedWhenClosed = false
+        window.titleVisibility = .hidden
+        window.titlebarAppearsTransparent = true
+        window.isMovable = false
+        window.contentView = NSHostingView(rootView: BreakOverlayView(controller: controller))
+        window.setFrame(screen.frame, display: true)
+        window.makeKeyAndOrderFront(nil)
+        window.orderFrontRegardless()
+        return window
     }
 }
 
