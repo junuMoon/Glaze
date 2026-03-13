@@ -13,7 +13,6 @@ final class GlazeController: NSObject, ObservableObject {
 
     private var scheduler: BreakScheduler
     private var ticker: DispatchSourceTimer?
-    private let tickerQueue = DispatchQueue(label: "com.fran.glaze.timer")
 
     private enum DefaultsKey {
         static let workMinutes = "Glaze.workMinutes"
@@ -146,10 +145,10 @@ final class GlazeController: NSObject, ObservableObject {
     }
 
     private func startTicker() {
-        let timer = DispatchSource.makeTimerSource(queue: tickerQueue)
+        let timer = DispatchSource.makeTimerSource(queue: .main)
         timer.schedule(deadline: .now() + 1, repeating: 1)
         timer.setEventHandler { [weak self] in
-            Task { @MainActor [weak self] in
+            MainActor.assumeIsolated {
                 guard let self else { return }
                 self.handleTick()
             }
