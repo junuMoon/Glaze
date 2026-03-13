@@ -1,6 +1,10 @@
 import Foundation
 
 struct BreakSettings: Equatable {
+    static let workMinutesRange = 5...90
+    static let breakSecondsRange = 10...300
+    static let headsUpSecondsRange = 0...120
+
     var workMinutes: Int
     var breakSeconds: Int
     var headsUpSeconds: Int
@@ -21,6 +25,14 @@ struct BreakSettings: Equatable {
 
     var clampedHeadsUpDuration: TimeInterval {
         min(TimeInterval(headsUpSeconds), max(0, workDuration - 1))
+    }
+
+    func sanitized() -> BreakSettings {
+        BreakSettings(
+            workMinutes: Self.workMinutesRange.clamp(workMinutes),
+            breakSeconds: Self.breakSecondsRange.clamp(breakSeconds),
+            headsUpSeconds: Self.headsUpSecondsRange.clamp(headsUpSeconds)
+        )
     }
 }
 
@@ -55,9 +67,9 @@ final class BreakScheduler {
     private var cycleCount: Int = 1
 
     init(settings: BreakSettings, now: Date = .now) {
-        self.settings = settings
+        self.settings = settings.sanitized()
         phaseStart = now
-        phaseEnd = now.addingTimeInterval(settings.workDuration)
+        phaseEnd = now.addingTimeInterval(self.settings.workDuration)
     }
 
     func tick(now: Date = .now) -> SessionSnapshot {
@@ -107,11 +119,11 @@ final class BreakScheduler {
     }
 
     func updateSettings(_ newSettings: BreakSettings, now: Date = .now) -> SessionSnapshot {
-        settings = newSettings
+        settings = newSettings.sanitized()
 
         if let pausedPhase {
             self.pausedPhase = pausedPhase
-            pausedRemaining = remainingForCurrentPhase(now: now)
+            pausedRemaining = max(1, pausedRemaining)
             return snapshot(now: now)
         }
 
@@ -220,5 +232,11 @@ final class BreakScheduler {
         case .breaking:
             return .breaking
         }
+    }
+}
+
+private extension ClosedRange where Bound == Int {
+    func clamp(_ value: Int) -> Int {
+        min(max(value, lowerBound), upperBound)
     }
 }

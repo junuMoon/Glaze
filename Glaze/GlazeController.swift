@@ -163,6 +163,7 @@ final class GlazeController: NSObject, ObservableObject {
     }
 
     private func applySettings() {
+        settings = settings.sanitized()
         saveSettings(settings)
         snapshot = scheduler.updateSettings(settings)
         refreshUI()
@@ -251,11 +252,25 @@ final class GlazeController: NSObject, ObservableObject {
         let headsUpSeconds = defaults.object(forKey: DefaultsKey.headsUpSeconds) as? Int
             ?? BreakSettings.default.headsUpSeconds
 
-        return BreakSettings(
+        let storedSettings = BreakSettings(
             workMinutes: workMinutes,
             breakSeconds: breakSeconds,
             headsUpSeconds: headsUpSeconds
         )
+
+        let sanitizedSettings = BreakSettings(
+            workMinutes: workMinutes,
+            breakSeconds: breakSeconds,
+            headsUpSeconds: headsUpSeconds
+        ).sanitized()
+
+        if sanitizedSettings != storedSettings {
+            defaults.set(sanitizedSettings.workMinutes, forKey: DefaultsKey.workMinutes)
+            defaults.set(sanitizedSettings.breakSeconds, forKey: DefaultsKey.breakSeconds)
+            defaults.set(sanitizedSettings.headsUpSeconds, forKey: DefaultsKey.headsUpSeconds)
+        }
+
+        return sanitizedSettings
     }
 
     private func saveSettings(_ settings: BreakSettings) {

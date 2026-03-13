@@ -10,16 +10,29 @@
 		40F2E8D17491998B9825B66C /* GlazeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8D8EFFCF511B46E715F785 /* GlazeApp.swift */; };
 		500C931EEFDCE1D197F3F701 /* BreakScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6411319A87C5960EB65D4EC7 /* BreakScheduler.swift */; };
 		5F0EA6BDB3B7E639CF6368F7 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51654ED6D3389AAAA3E4CE8F /* MenuBarView.swift */; };
+		94921C14ABC552DD08DFF524 /* BreakSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4DD78FF97D8B4D92B5AF77 /* BreakSchedulerTests.swift */; };
 		B40F9A5E946AD05C4441D5BA /* GlazeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B1EE1AC99067778711CA79 /* GlazeController.swift */; };
 		CF723BA4182C776D25430FDA /* BreakOverlayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1520DC1EBFEDF79307741859 /* BreakOverlayManager.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		22AF8A1B4BFFED7F004F8794 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D20B88A01DDC559909FB7743 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 24D57E43B2BFAB841BA437D6;
+			remoteInfo = Glaze;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		1520DC1EBFEDF79307741859 /* BreakOverlayManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayManager.swift; sourceTree = "<group>"; };
 		4B35A626C5BE178A04148323 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		51654ED6D3389AAAA3E4CE8F /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		6411319A87C5960EB65D4EC7 /* BreakScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakScheduler.swift; sourceTree = "<group>"; };
+		6E4DD78FF97D8B4D92B5AF77 /* BreakSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakSchedulerTests.swift; sourceTree = "<group>"; };
 		95B1EE1AC99067778711CA79 /* GlazeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlazeController.swift; sourceTree = "<group>"; };
+		A00099FE48EC26A99E84BACC /* GlazeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GlazeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8EA4569B7EAC2AEF1A02440 /* Glaze.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Glaze.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC8D8EFFCF511B46E715F785 /* GlazeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlazeApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -29,6 +42,7 @@
 			isa = PBXGroup;
 			children = (
 				7E0FC2B69A9E9E47009569A0 /* Glaze */,
+				8500D9FE8D5C775BEDD9F297 /* GlazeTests */,
 				790EDDBD6C1EB697073C0A3E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -37,6 +51,7 @@
 			isa = PBXGroup;
 			children = (
 				C8EA4569B7EAC2AEF1A02440 /* Glaze.app */,
+				A00099FE48EC26A99E84BACC /* GlazeTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -52,6 +67,14 @@
 				AEF810FF28C82D871B2380B8 /* Resources */,
 			);
 			path = Glaze;
+			sourceTree = "<group>";
+		};
+		8500D9FE8D5C775BEDD9F297 /* GlazeTests */ = {
+			isa = PBXGroup;
+			children = (
+				6E4DD78FF97D8B4D92B5AF77 /* BreakSchedulerTests.swift */,
+			);
+			path = GlazeTests;
 			sourceTree = "<group>";
 		};
 		AEF810FF28C82D871B2380B8 /* Resources */ = {
@@ -82,6 +105,24 @@
 			productReference = C8EA4569B7EAC2AEF1A02440 /* Glaze.app */;
 			productType = "com.apple.product-type.application";
 		};
+		FF4A675B9C3EB9E049306E5E /* GlazeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6D72FC026E89B652CB757CD9 /* Build configuration list for PBXNativeTarget "GlazeTests" */;
+			buildPhases = (
+				EB1CCC73B69E95ACF8BB5AEB /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8DDC247D659CEA0F006A9EF6 /* PBXTargetDependency */,
+			);
+			name = GlazeTests;
+			packageProductDependencies = (
+			);
+			productName = GlazeTests;
+			productReference = A00099FE48EC26A99E84BACC /* GlazeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -106,6 +147,7 @@
 			projectRoot = "";
 			targets = (
 				24D57E43B2BFAB841BA437D6 /* Glaze */,
+				FF4A675B9C3EB9E049306E5E /* GlazeTests */,
 			);
 		};
 /* End PBXProject section */
@@ -123,9 +165,44 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EB1CCC73B69E95ACF8BB5AEB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				94921C14ABC552DD08DFF524 /* BreakSchedulerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		8DDC247D659CEA0F006A9EF6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 24D57E43B2BFAB841BA437D6 /* Glaze */;
+			targetProxy = 22AF8A1B4BFFED7F004F8794 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		0D10885938231BBDE53D5AED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fran.GlazeTests;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Glaze.app/Contents/MacOS/Glaze";
+			};
+			name = Debug;
+		};
 		2A45EC4D3513E8EFC16EE0E5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -179,6 +256,25 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		81599436C071A3BC8F2071D9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fran.GlazeTests;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Glaze.app/Contents/MacOS/Glaze";
 			};
 			name = Release;
 		};
@@ -297,6 +393,15 @@
 			buildConfigurations = (
 				AA05A52954440B2B6D9DDEE7 /* Debug */,
 				2A45EC4D3513E8EFC16EE0E5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		6D72FC026E89B652CB757CD9 /* Build configuration list for PBXNativeTarget "GlazeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0D10885938231BBDE53D5AED /* Debug */,
+				81599436C071A3BC8F2071D9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

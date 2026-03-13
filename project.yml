@@ -21,3 +21,14 @@ targets:
         PRODUCT_NAME: Glaze
         MARKETING_VERSION: "0.1.0"
         CURRENT_PROJECT_VERSION: "1"
+  GlazeTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources: [GlazeTests]
+    dependencies:
+      - target: Glaze
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: true
+        SWIFT_VERSION: "6.0"
+        MACOSX_DEPLOYMENT_TARGET: "15.0"
