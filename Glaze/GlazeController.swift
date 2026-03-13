@@ -36,36 +36,83 @@ final class GlazeController: NSObject, ObservableObject {
         formatDuration(snapshot.remaining)
     }
 
-    var phaseTitleText: String {
+    var phaseSymbolName: String {
         switch snapshot.phase {
         case .working:
-            return "Focus session"
+            return "timer"
         case .headsUp:
-            return "Break coming up"
+            return "bell.badge.fill"
         case .breaking:
-            return "Break time"
-        case .paused(let resumePhase):
-            switch resumePhase {
-            case .working:
-                return "Paused during focus"
-            case .headsUp:
-                return "Paused before break"
-            case .breaking:
-                return "Paused during break"
-            }
+            return "eye.circle.fill"
+        case .paused:
+            return "pause.circle.fill"
         }
     }
 
-    var phaseDetailText: String {
+    var phaseBadgeText: String {
         switch snapshot.phase {
         case .working:
-            return "Stay focused. Glaze will warn you before the break starts."
+            return "In Focus"
         case .headsUp:
-            return "Wrap up the current thought or snooze the next break."
+            return "Heads-up"
         case .breaking:
-            return "Rest your eyes and let the next work cycle start automatically."
+            return "Break Live"
         case .paused:
-            return "The timer is paused. Resume when you are ready."
+            return "Paused"
+        }
+    }
+
+    var menuHeroTitle: String {
+        switch snapshot.phase {
+        case .working:
+            return "Keep your momentum"
+        case .headsUp:
+            return "Wrap this thought"
+        case .breaking:
+            return "Time to reset"
+        case .paused:
+            return "Hold the rhythm"
+        }
+    }
+
+    var menuDetailText: String {
+        switch snapshot.phase {
+        case .working:
+            return "A gentle heads-up will appear before the next break so you can stay in flow."
+        case .headsUp:
+            return "Take the break now, or snooze it for a minute without losing the thread."
+        case .breaking:
+            return "Look away, breathe once, and let the next focus block begin on its own."
+        case .paused:
+            return "Nothing is moving right now. Resume whenever you want the cycle back."
+        }
+    }
+
+    var overlayTitleText: String {
+        "Look away for a moment"
+    }
+
+    var overlayDetailText: String {
+        "Relax your eyes. The next focus block starts automatically."
+    }
+
+    var phaseTitleText: String {
+        switch snapshot.phase {
+        case .working:
+            return "Focus block"
+        case .headsUp:
+            return "Break incoming"
+        case .breaking:
+            return "Short break"
+        case .paused(let resumePhase):
+            switch resumePhase {
+            case .working:
+                return "Focus paused"
+            case .headsUp:
+                return "Heads-up paused"
+            case .breaking:
+                return "Break paused"
+            }
         }
     }
 
@@ -132,8 +179,12 @@ final class GlazeController: NSObject, ObservableObject {
     private func configurePopover() {
         popover.behavior = .transient
         popover.animates = true
-        popover.contentSize = NSSize(width: 320, height: 360)
-        popover.contentViewController = NSHostingController(rootView: MenuBarView(controller: self))
+        popover.appearance = NSAppearance(named: .darkAqua)
+        popover.contentSize = NSSize(width: 360, height: 520)
+        popover.contentViewController = NSHostingController(
+            rootView: MenuBarView(controller: self)
+                .environment(\.colorScheme, .dark)
+        )
     }
 
     private func configureStatusItem() {
@@ -189,25 +240,20 @@ final class GlazeController: NSObject, ObservableObject {
     private func updateStatusItem() {
         guard let button = statusItem.button else { return }
 
-        let symbolName: String
         let label: String
 
         switch snapshot.phase {
         case .working:
-            symbolName = "timer"
             label = shortLabel(for: snapshot.remaining, style: .minutes)
         case .headsUp:
-            symbolName = "bell.badge.fill"
             label = shortLabel(for: snapshot.remaining, style: .seconds)
         case .breaking:
-            symbolName = "eye.circle.fill"
             label = shortLabel(for: snapshot.remaining, style: .seconds)
         case .paused:
-            symbolName = "pause.circle.fill"
             label = "Paused"
         }
 
-        button.image = symbolImage(named: symbolName)
+        button.image = symbolImage(named: phaseSymbolName)
         button.attributedTitle = NSAttributedString(
             string: " \(label)",
             attributes: [

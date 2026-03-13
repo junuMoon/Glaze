@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2311271BDA098E5F751D63FA /* GlazeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10E0DBD208C545DC8569ABF /* GlazeTheme.swift */; };
 		40F2E8D17491998B9825B66C /* GlazeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8D8EFFCF511B46E715F785 /* GlazeApp.swift */; };
 		500C931EEFDCE1D197F3F701 /* BreakScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6411319A87C5960EB65D4EC7 /* BreakScheduler.swift */; };
 		5F0EA6BDB3B7E639CF6368F7 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51654ED6D3389AAAA3E4CE8F /* MenuBarView.swift */; };
@@ -33,6 +34,7 @@
 		6E4DD78FF97D8B4D92B5AF77 /* BreakSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakSchedulerTests.swift; sourceTree = "<group>"; };
 		95B1EE1AC99067778711CA79 /* GlazeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlazeController.swift; sourceTree = "<group>"; };
 		A00099FE48EC26A99E84BACC /* GlazeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GlazeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C10E0DBD208C545DC8569ABF /* GlazeTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlazeTheme.swift; sourceTree = "<group>"; };
 		C8EA4569B7EAC2AEF1A02440 /* Glaze.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Glaze.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC8D8EFFCF511B46E715F785 /* GlazeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlazeApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -63,6 +65,7 @@
 				6411319A87C5960EB65D4EC7 /* BreakScheduler.swift */,
 				FC8D8EFFCF511B46E715F785 /* GlazeApp.swift */,
 				95B1EE1AC99067778711CA79 /* GlazeController.swift */,
+				C10E0DBD208C545DC8569ABF /* GlazeTheme.swift */,
 				51654ED6D3389AAAA3E4CE8F /* MenuBarView.swift */,
 				AEF810FF28C82D871B2380B8 /* Resources */,
 			);
@@ -161,6 +164,7 @@
 				500C931EEFDCE1D197F3F701 /* BreakScheduler.swift in Sources */,
 				40F2E8D17491998B9825B66C /* GlazeApp.swift in Sources */,
 				B40F9A5E946AD05C4441D5BA /* GlazeController.swift in Sources */,
+				2311271BDA098E5F751D63FA /* GlazeTheme.swift in Sources */,
 				5F0EA6BDB3B7E639CF6368F7 /* MenuBarView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

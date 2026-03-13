@@ -54,48 +54,73 @@ private struct BreakOverlayView: View {
 
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: [
-                    Color.black.opacity(0.88),
-                    Color(red: 0.16, green: 0.08, blue: 0.22).opacity(0.94)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            GlazeOverlayBackdrop()
 
-            VStack(spacing: 20) {
-                Image(systemName: "eye.circle.fill")
-                    .font(.system(size: 56))
-                    .foregroundStyle(.pink.opacity(0.9))
+            VStack {
+                Spacer(minLength: 0)
 
-                Text("Look away for a moment")
-                    .font(.system(size: 40, weight: .semibold))
+                VStack(spacing: 28) {
+                    GlazePill(icon: "sparkles", label: "Glaze Break", accented: true)
 
-                Text(controller.phaseDetailText)
-                    .font(.system(size: 18))
-                    .foregroundStyle(.white.opacity(0.7))
+                    VStack(spacing: 18) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.white.opacity(0.07))
+                                .frame(width: 104, height: 104)
 
-                Text(controller.countdownText)
-                    .font(.system(size: 64, weight: .bold, design: .rounded))
-                    .monospacedDigit()
+                            Circle()
+                                .fill(GlazeTheme.accentPink.opacity(0.16))
+                                .frame(width: 144, height: 144)
+                                .blur(radius: 28)
 
-                HStack(spacing: 12) {
-                    Button("Skip Break") {
-                        controller.skipBreak()
+                            Image(systemName: "eye.circle.fill")
+                                .font(.system(size: 58, weight: .semibold))
+                                .foregroundStyle(GlazeTheme.textPrimary)
+                        }
+
+                        Text(controller.overlayTitleText)
+                            .font(.system(size: 46, weight: .semibold, design: .rounded))
+                            .foregroundStyle(GlazeTheme.textPrimary)
+
+                        Text(controller.overlayDetailText)
+                            .font(.system(size: 19, weight: .medium, design: .rounded))
+                            .foregroundStyle(GlazeTheme.textSecondary)
+                            .multilineTextAlignment(.center)
+
+                        Text(controller.countdownText)
+                            .font(.system(size: 92, weight: .bold, design: .rounded))
+                            .monospacedDigit()
+                            .foregroundStyle(GlazeTheme.textPrimary)
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.large)
 
-                    Button("Pause Timer") {
-                        controller.pauseOrResume()
+                    HStack(spacing: 12) {
+                        Button("Skip Break") {
+                            controller.skipBreak()
+                        }
+                        .buttonStyle(GlazeGhostButtonStyle())
+
+                        Button("Pause Timer") {
+                            controller.pauseOrResume()
+                        }
+                        .buttonStyle(GlazeSecondaryButtonStyle())
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.pink)
-                    .controlSize(.large)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(Color.white.opacity(0.05))
+                            .overlay(
+                                Capsule(style: .continuous)
+                                    .stroke(GlazeTheme.stroke, lineWidth: 1)
+                            )
+                    )
                 }
+                .frame(maxWidth: 560)
+                .padding(44)
+
+                Spacer(minLength: 0)
             }
-            .padding(40)
         }
+        .preferredColorScheme(.dark)
     }
 }
