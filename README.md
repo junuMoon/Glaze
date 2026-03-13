@@ -57,4 +57,4 @@ Then launch `Glaze.app` from Xcode or from the built product.
 - onboarding and polished settings window
 - launch at login
 
-More detail lives in [docs/mvp-scope.ko.md](/Users/fran/Workspace/Glaze/docs/mvp-scope.ko.md).
+More detail lives in [docs/mvp-scope.ko.md](/Users/fran/Workspace/Glaze/docs/mvp-scope.ko.md) and [docs/ui-redesign-plan.ko.md](/Users/fran/Workspace/Glaze/docs/ui-redesign-plan.ko.md).
