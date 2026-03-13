@@ -12,7 +12,8 @@ final class GlazeController: NSObject, ObservableObject {
     private let overlayManager = BreakOverlayManager()
 
     private var scheduler: BreakScheduler
-    private var ticker: Timer?
+    private var ticker: DispatchSourceTimer?
+    private let tickerQueue = DispatchQueue(label: "com.fran.glaze.timer")
 
     private enum DefaultsKey {
         static let workMinutes = "Glaze.workMinutes"
@@ -145,20 +146,19 @@ final class GlazeController: NSObject, ObservableObject {
     }
 
     private func startTicker() {
-        ticker = Timer.scheduledTimer(
-            timeInterval: 1,
-            target: self,
-            selector: #selector(handleTick),
-            userInfo: nil,
-            repeats: true
-        )
-
-        if let ticker {
-            RunLoop.main.add(ticker, forMode: .common)
+        let timer = DispatchSource.makeTimerSource(queue: tickerQueue)
+        timer.schedule(deadline: .now() + 1, repeating: 1)
+        timer.setEventHandler { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.handleTick()
+            }
         }
+        ticker = timer
+        timer.resume()
     }
 
-    @objc private func handleTick() {
+    private func handleTick() {
         snapshot = scheduler.tick()
         refreshUI()
     }
@@ -177,6 +177,9 @@ final class GlazeController: NSObject, ObservableObject {
     private func syncOverlay() {
         switch snapshot.phase {
         case .breaking:
+            if popover.isShown {
+                popover.performClose(nil)
+            }
             overlayManager.show(controller: self)
         default:
             overlayManager.hide()
