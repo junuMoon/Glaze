@@ -22,8 +22,7 @@ final class BreakOverlayManager {
             window.collectionBehavior = [
                 .canJoinAllSpaces,
                 .fullScreenAuxiliary,
-                .stationary,
-                .moveToActiveSpace
+                .ignoresCycle
             ]
             window.ignoresMouseEvents = false
             window.titleVisibility = .hidden
