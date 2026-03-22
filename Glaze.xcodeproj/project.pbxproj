@@ -7,13 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04A0B5285642298F85D92B1A /* IdleAutoPause.swift in Sources */ = {isa = PBXBuildFile; fileRef = 121FD2DCACB5368A0DD2D037 /* IdleAutoPause.swift */; };
 		2311271BDA098E5F751D63FA /* GlazeTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10E0DBD208C545DC8569ABF /* GlazeTheme.swift */; };
+		3BFB771B6D1AB8AAC70A37AC /* BreakDailyStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A1F125DF2A14FC69F57E05 /* BreakDailyStats.swift */; };
 		40F2E8D17491998B9825B66C /* GlazeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8D8EFFCF511B46E715F785 /* GlazeApp.swift */; };
 		500C931EEFDCE1D197F3F701 /* BreakScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6411319A87C5960EB65D4EC7 /* BreakScheduler.swift */; };
 		5F0EA6BDB3B7E639CF6368F7 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51654ED6D3389AAAA3E4CE8F /* MenuBarView.swift */; };
+		746CD0BBA203EB878825DF80 /* ActivityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2104CE9B429F760AA0DBBA08 /* ActivityMonitor.swift */; };
+		8B88759C1491B46961E2097B /* BreakDailyStatsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44AC469FFEBFF0FD2CF6434 /* BreakDailyStatsTests.swift */; };
 		94921C14ABC552DD08DFF524 /* BreakSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4DD78FF97D8B4D92B5AF77 /* BreakSchedulerTests.swift */; };
+		9626BD6E5B0B78071A399BA1 /* BreakShareIndicatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2CE8F3631EA99C6B04BE04E /* BreakShareIndicatorTests.swift */; };
 		B40F9A5E946AD05C4441D5BA /* GlazeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B1EE1AC99067778711CA79 /* GlazeController.swift */; };
 		CF723BA4182C776D25430FDA /* BreakOverlayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1520DC1EBFEDF79307741859 /* BreakOverlayManager.swift */; };
+		D13536B4AD240EB32474C14E /* IdleAutoPausePolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D20886780ABB08E4CCDD31 /* IdleAutoPausePolicyTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,15 +33,21 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		00D20886780ABB08E4CCDD31 /* IdleAutoPausePolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdleAutoPausePolicyTests.swift; sourceTree = "<group>"; };
+		121FD2DCACB5368A0DD2D037 /* IdleAutoPause.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdleAutoPause.swift; sourceTree = "<group>"; };
 		1520DC1EBFEDF79307741859 /* BreakOverlayManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakOverlayManager.swift; sourceTree = "<group>"; };
+		2104CE9B429F760AA0DBBA08 /* ActivityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityMonitor.swift; sourceTree = "<group>"; };
 		4B35A626C5BE178A04148323 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		51654ED6D3389AAAA3E4CE8F /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		6411319A87C5960EB65D4EC7 /* BreakScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakScheduler.swift; sourceTree = "<group>"; };
 		6E4DD78FF97D8B4D92B5AF77 /* BreakSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakSchedulerTests.swift; sourceTree = "<group>"; };
+		79A1F125DF2A14FC69F57E05 /* BreakDailyStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakDailyStats.swift; sourceTree = "<group>"; };
 		95B1EE1AC99067778711CA79 /* GlazeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlazeController.swift; sourceTree = "<group>"; };
 		A00099FE48EC26A99E84BACC /* GlazeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GlazeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C10E0DBD208C545DC8569ABF /* GlazeTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlazeTheme.swift; sourceTree = "<group>"; };
+		C44AC469FFEBFF0FD2CF6434 /* BreakDailyStatsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakDailyStatsTests.swift; sourceTree = "<group>"; };
 		C8EA4569B7EAC2AEF1A02440 /* Glaze.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Glaze.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E2CE8F3631EA99C6B04BE04E /* BreakShareIndicatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakShareIndicatorTests.swift; sourceTree = "<group>"; };
 		FC8D8EFFCF511B46E715F785 /* GlazeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlazeApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -61,11 +73,14 @@
 		7E0FC2B69A9E9E47009569A0 /* Glaze */ = {
 			isa = PBXGroup;
 			children = (
+				2104CE9B429F760AA0DBBA08 /* ActivityMonitor.swift */,
+				79A1F125DF2A14FC69F57E05 /* BreakDailyStats.swift */,
 				1520DC1EBFEDF79307741859 /* BreakOverlayManager.swift */,
 				6411319A87C5960EB65D4EC7 /* BreakScheduler.swift */,
 				FC8D8EFFCF511B46E715F785 /* GlazeApp.swift */,
 				95B1EE1AC99067778711CA79 /* GlazeController.swift */,
 				C10E0DBD208C545DC8569ABF /* GlazeTheme.swift */,
+				121FD2DCACB5368A0DD2D037 /* IdleAutoPause.swift */,
 				51654ED6D3389AAAA3E4CE8F /* MenuBarView.swift */,
 				AEF810FF28C82D871B2380B8 /* Resources */,
 			);
@@ -75,7 +90,10 @@
 		8500D9FE8D5C775BEDD9F297 /* GlazeTests */ = {
 			isa = PBXGroup;
 			children = (
+				C44AC469FFEBFF0FD2CF6434 /* BreakDailyStatsTests.swift */,
 				6E4DD78FF97D8B4D92B5AF77 /* BreakSchedulerTests.swift */,
+				E2CE8F3631EA99C6B04BE04E /* BreakShareIndicatorTests.swift */,
+				00D20886780ABB08E4CCDD31 /* IdleAutoPausePolicyTests.swift */,
 			);
 			path = GlazeTests;
 			sourceTree = "<group>";
@@ -160,11 +178,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				746CD0BBA203EB878825DF80 /* ActivityMonitor.swift in Sources */,
+				3BFB771B6D1AB8AAC70A37AC /* BreakDailyStats.swift in Sources */,
 				CF723BA4182C776D25430FDA /* BreakOverlayManager.swift in Sources */,
 				500C931EEFDCE1D197F3F701 /* BreakScheduler.swift in Sources */,
 				40F2E8D17491998B9825B66C /* GlazeApp.swift in Sources */,
 				B40F9A5E946AD05C4441D5BA /* GlazeController.swift in Sources */,
 				2311271BDA098E5F751D63FA /* GlazeTheme.swift in Sources */,
+				04A0B5285642298F85D92B1A /* IdleAutoPause.swift in Sources */,
 				5F0EA6BDB3B7E639CF6368F7 /* MenuBarView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -173,7 +194,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B88759C1491B46961E2097B /* BreakDailyStatsTests.swift in Sources */,
 				94921C14ABC552DD08DFF524 /* BreakSchedulerTests.swift in Sources */,
+				9626BD6E5B0B78071A399BA1 /* BreakShareIndicatorTests.swift in Sources */,
+				D13536B4AD240EB32474C14E /* IdleAutoPausePolicyTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

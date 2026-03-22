@@ -17,6 +17,8 @@ enum GlazeTheme {
     static let accentPink = Color(red: 0.95, green: 0.34, blue: 0.58)
     static let accentAmber = Color(red: 0.96, green: 0.69, blue: 0.30)
     static let accentPurple = Color(red: 0.49, green: 0.37, blue: 0.95)
+    static let signalRed = Color(red: 0.98, green: 0.39, blue: 0.43)
+    static let signalGreen = Color(red: 0.39, green: 0.84, blue: 0.60)
 
     static let appBackground = LinearGradient(
         colors: [backgroundTop, backgroundBottom],

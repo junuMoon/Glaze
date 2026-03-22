@@ -10,9 +10,15 @@ final class GlazeController: NSObject, ObservableObject {
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let popover = NSPopover()
     private let overlayManager = BreakOverlayManager()
+    private let activityMonitor = ActivityMonitor()
+    private let idleTimeProvider: any IdleTimeProviding
+    private let idleAutoPausePolicy: IdleAutoPausePolicy
+    private let breakStatsTracker: BreakDailyStatsTracker
 
     private var scheduler: BreakScheduler
     private var ticker: DispatchSourceTimer?
+    private var pauseSource: PauseSource?
+    private var lastBreakAccountingDate: Date
 
     private enum DefaultsKey {
         static let workMinutes = "Glaze.workMinutes"
@@ -20,14 +26,24 @@ final class GlazeController: NSObject, ObservableObject {
         static let headsUpSeconds = "Glaze.headsUpSeconds"
     }
 
-    override init() {
+    init(
+        idleTimeProvider: any IdleTimeProviding = SystemIdleTimeProvider(),
+        idleAutoPausePolicy: IdleAutoPausePolicy = IdleAutoPausePolicy(),
+        breakStatsTracker: BreakDailyStatsTracker = BreakDailyStatsTracker()
+    ) {
+        let now = Date.now
+        self.idleTimeProvider = idleTimeProvider
+        self.idleAutoPausePolicy = idleAutoPausePolicy
+        self.breakStatsTracker = breakStatsTracker
+        lastBreakAccountingDate = now
         let loadedSettings = Self.loadSettings()
         settings = loadedSettings
-        scheduler = BreakScheduler(settings: loadedSettings)
-        snapshot = scheduler.tick()
+        scheduler = BreakScheduler(settings: loadedSettings, now: now)
+        snapshot = scheduler.tick(now: now)
         super.init()
         configurePopover()
         configureStatusItem()
+        configureActivityMonitor()
         startTicker()
         refreshUI()
     }
@@ -58,7 +74,7 @@ final class GlazeController: NSObject, ObservableObject {
         case .breaking:
             return "Break Live"
         case .paused:
-            return "Paused"
+            return isAutoPaused ? "Auto-paused" : "Paused"
         }
     }
 
@@ -71,7 +87,7 @@ final class GlazeController: NSObject, ObservableObject {
         case .breaking:
             return "Time to reset"
         case .paused:
-            return "Hold the rhythm"
+            return isAutoPaused ? "Paused while you're away" : "Hold the rhythm"
         }
     }
 
@@ -84,6 +100,10 @@ final class GlazeController: NSObject, ObservableObject {
         case .breaking:
             return "Look away, breathe once, and let the next focus block begin on its own."
         case .paused:
+            if isAutoPaused {
+                return "The cycle stopped after \(idleThresholdText) of idle time and will resume when you come back."
+            }
+
             return "Nothing is moving right now. Resume whenever you want the cycle back."
         }
     }
@@ -105,6 +125,10 @@ final class GlazeController: NSObject, ObservableObject {
         case .breaking:
             return "Short break"
         case .paused(let resumePhase):
+            if isAutoPaused {
+                return "Auto-paused while away"
+            }
+
             switch resumePhase {
             case .working:
                 return "Focus paused"
@@ -116,33 +140,77 @@ final class GlazeController: NSObject, ObservableObject {
         }
     }
 
+    var autoPauseSummaryText: String {
+        "Auto-pauses after \(idleThresholdText) of idle time during focus or heads-up."
+    }
+
+    var todayBreakDurationText: String {
+        breakDurationText(for: todayBreakSummary.breakDuration)
+    }
+
+    var todayBreakShareText: String {
+        String(format: "%.1f%%", todayBreakShareIndicator.fraction * 100)
+    }
+
+    var todayBreakShareIndicator: BreakShareIndicator {
+        BreakShareIndicator(fraction: todayBreakSummary.dayFraction)
+    }
+
+    var todayBreakDetailText: String {
+        if snapshot.phase == .breaking {
+            return "Counting while you stay on break."
+        }
+
+        return "Tracked across breaks you actually kept today."
+    }
+
+    var pausedPrimaryActionTitle: String {
+        isAutoPaused ? "Resume Now" : "Resume"
+    }
+
     func pauseOrResume() {
+        let now = Date.now
+        recordBreakTime(until: now)
+
         switch snapshot.phase {
         case .paused:
-            snapshot = scheduler.resume()
+            snapshot = scheduler.resume(now: now)
+            pauseSource = nil
         default:
-            snapshot = scheduler.pause()
+            snapshot = scheduler.pause(now: now)
+            pauseSource = .manual
         }
         refreshUI()
     }
 
     func snoozeOneMinute() {
-        snapshot = scheduler.snooze(seconds: 60)
+        let now = Date.now
+        recordBreakTime(until: now)
+        snapshot = scheduler.snooze(seconds: 60, now: now)
         refreshUI()
     }
 
     func startBreakNow() {
-        snapshot = scheduler.startBreakNow()
+        let now = Date.now
+        recordBreakTime(until: now)
+        snapshot = scheduler.startBreakNow(now: now)
+        pauseSource = nil
         refreshUI()
     }
 
     func skipBreak() {
-        snapshot = scheduler.skipBreak()
+        let now = Date.now
+        recordBreakTime(until: now)
+        snapshot = scheduler.skipBreak(now: now)
+        pauseSource = nil
         refreshUI()
     }
 
     func resetCycle() {
-        snapshot = scheduler.resetCycle()
+        let now = Date.now
+        recordBreakTime(until: now)
+        snapshot = scheduler.resetCycle(now: now)
+        pauseSource = nil
         refreshUI()
     }
 
@@ -162,6 +230,7 @@ final class GlazeController: NSObject, ObservableObject {
     }
 
     func quit() {
+        recordBreakTime(until: Date.now)
         NSApp.terminate(nil)
     }
 
@@ -180,7 +249,7 @@ final class GlazeController: NSObject, ObservableObject {
         popover.behavior = .transient
         popover.animates = true
         popover.appearance = NSAppearance(named: .darkAqua)
-        popover.contentSize = NSSize(width: 360, height: 520)
+        popover.contentSize = NSSize(width: 360, height: 620)
         popover.contentViewController = NSHostingController(
             rootView: MenuBarView(controller: self)
                 .environment(\.colorScheme, .dark)
@@ -193,6 +262,12 @@ final class GlazeController: NSObject, ObservableObject {
         button.action = #selector(togglePopover(_:))
         button.sendAction(on: [.leftMouseUp])
         button.imagePosition = .imageLeft
+    }
+
+    private func configureActivityMonitor() {
+        activityMonitor.start { [weak self] in
+            self?.handleObservedActivity()
+        }
     }
 
     private func startTicker() {
@@ -209,20 +284,73 @@ final class GlazeController: NSObject, ObservableObject {
     }
 
     private func handleTick() {
-        snapshot = scheduler.tick()
+        let now = Date.now
+        recordBreakTime(until: now)
+        evaluateIdleAutoPause(now: now)
+        snapshot = scheduler.tick(now: now)
         refreshUI()
     }
 
     private func applySettings() {
+        let now = Date.now
+        recordBreakTime(until: now)
         settings = settings.sanitized()
         saveSettings(settings)
-        snapshot = scheduler.updateSettings(settings)
+        snapshot = scheduler.updateSettings(settings, now: now)
         refreshUI()
     }
 
     private func refreshUI() {
+        normalizePauseSource()
         updateStatusItem()
         syncOverlay()
+    }
+
+    private func evaluateIdleAutoPause(now: Date) {
+        let idleSeconds = idleTimeProvider.idleTimeInterval()
+        let action = idleAutoPausePolicy.action(
+            for: snapshot.phase,
+            pauseSource: pauseSource,
+            idleSeconds: idleSeconds
+        )
+
+        switch action {
+        case .pause:
+            snapshot = scheduler.pause(now: now)
+            pauseSource = .idle
+        case .resume:
+            snapshot = scheduler.resume(now: now)
+            pauseSource = nil
+        case .none:
+            break
+        }
+    }
+
+    private func handleObservedActivity() {
+        guard pauseSource == .idle else { return }
+        guard case .paused = snapshot.phase else { return }
+
+        let now = Date.now
+        snapshot = scheduler.resume(now: now)
+        pauseSource = nil
+        refreshUI()
+    }
+
+    private func recordBreakTime(until now: Date) {
+        guard now > lastBreakAccountingDate else { return }
+
+        if snapshot.phase == .breaking {
+            breakStatsTracker.recordBreak(from: lastBreakAccountingDate, to: now)
+        }
+
+        lastBreakAccountingDate = now
+    }
+
+    private func normalizePauseSource() {
+        guard case .paused = snapshot.phase else {
+            pauseSource = nil
+            return
+        }
     }
 
     private func syncOverlay() {
@@ -250,7 +378,7 @@ final class GlazeController: NSObject, ObservableObject {
         case .breaking:
             label = shortLabel(for: snapshot.remaining, style: .seconds)
         case .paused:
-            label = "Paused"
+            label = isAutoPaused ? "Away" : "Paused"
         }
 
         button.image = symbolImage(named: phaseSymbolName)
@@ -280,6 +408,45 @@ final class GlazeController: NSObject, ObservableObject {
         let minutes = total / 60
         let seconds = total % 60
         return String(format: "%02d:%02d", minutes, seconds)
+    }
+
+    private var isAutoPaused: Bool {
+        pauseSource == .idle
+    }
+
+    private var idleThresholdText: String {
+        naturalDurationText(for: idleAutoPausePolicy.pauseThreshold)
+    }
+
+    private func naturalDurationText(for duration: TimeInterval) -> String {
+        let total = max(0, Int(duration.rounded()))
+
+        if total >= 60, total % 60 == 0 {
+            return "\(total / 60) min"
+        }
+
+        if total >= 60 {
+            return "\(total / 60)m \(total % 60)s"
+        }
+
+        return "\(total) sec"
+    }
+
+    private func breakDurationText(for duration: TimeInterval) -> String {
+        let total = max(0, Int(duration.rounded()))
+        let hours = total / 3600
+        let minutes = (total % 3600) / 60
+        let seconds = total % 60
+
+        if hours > 0 {
+            return String(format: "%dh %02dm", hours, minutes)
+        }
+
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
+
+    private var todayBreakSummary: BreakDaySummary {
+        breakStatsTracker.summary(for: Date.now)
     }
 
     private func symbolImage(named name: String) -> NSImage? {

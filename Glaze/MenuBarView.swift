@@ -133,7 +133,7 @@ struct MenuBarView: View {
             }
         case .paused:
             HStack(spacing: 10) {
-                Button("Resume") {
+                Button(controller.pausedPrimaryActionTitle) {
                     controller.pauseOrResume()
                 }
                 .buttonStyle(GlazePrimaryButtonStyle())
@@ -150,7 +150,7 @@ struct MenuBarView: View {
         GlazeCardSurface(radius: 22, padding: 16) {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
-                    Text("Cycle Settings")
+                    Text("Today & Settings")
                         .font(.system(size: 13, weight: .semibold, design: .rounded))
                         .foregroundStyle(GlazeTheme.textPrimary)
 
@@ -159,6 +159,19 @@ struct MenuBarView: View {
                     Text("Saved locally")
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(GlazeTheme.textMuted)
+                }
+
+                HStack(spacing: 10) {
+                    statsTile(
+                        title: "Today on break",
+                        value: controller.todayBreakDurationText,
+                        detail: controller.todayBreakDetailText
+                    )
+
+                    shareStatsTile(
+                        indicator: controller.todayBreakShareIndicator,
+                        value: controller.todayBreakShareText
+                    )
                 }
 
                 VStack(spacing: 10) {
@@ -195,6 +208,11 @@ struct MenuBarView: View {
                         step: 5
                     )
                 }
+
+                Text(controller.autoPauseSummaryText)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(GlazeTheme.textMuted)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
@@ -217,6 +235,128 @@ struct MenuBarView: View {
 
     private func summaryChip(title: String, value: String) -> some View {
         GlazePill(icon: nil, label: "\(title) \(value)")
+    }
+
+    private func statsTile(title: String, value: String, detail: String) -> some View {
+        statsTileSurface {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(title)
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .foregroundStyle(GlazeTheme.textMuted)
+
+                Text(value)
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundStyle(GlazeTheme.textPrimary)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+
+                Text(detail)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(GlazeTheme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Spacer(minLength: 0)
+            }
+        }
+    }
+
+    private func shareStatsTile(indicator: BreakShareIndicator, value: String) -> some View {
+        statsTileSurface {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Share")
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .foregroundStyle(GlazeTheme.textMuted)
+
+                HStack(alignment: .center, spacing: 8) {
+                    Circle()
+                        .fill(shareColor(for: indicator.level))
+                        .frame(width: 12, height: 12)
+
+                    Text(value)
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundStyle(GlazeTheme.textPrimary)
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    shareLegendRow(
+                        title: "Red",
+                        threshold: "< 0.5%",
+                        color: GlazeTheme.signalRed,
+                        isActive: indicator.level == .warning
+                    )
+
+                    shareLegendRow(
+                        title: "Orange",
+                        threshold: "< 1.0%",
+                        color: GlazeTheme.accentAmber,
+                        isActive: indicator.level == .caution
+                    )
+
+                    shareLegendRow(
+                        title: "Green",
+                        threshold: ">= 1.0%",
+                        color: GlazeTheme.signalGreen,
+                        isActive: indicator.level == .healthy
+                    )
+                }
+
+                Spacer(minLength: 0)
+            }
+        }
+    }
+
+    private func statsTileSurface<Content: View>(
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        content()
+            .frame(maxWidth: .infinity, minHeight: 148, alignment: .topLeading)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 13)
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(GlazeTheme.rowFill)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .stroke(GlazeTheme.stroke, lineWidth: 1)
+                    )
+            )
+    }
+
+    private func shareLegendRow(
+        title: String,
+        threshold: String,
+        color: Color,
+        isActive: Bool
+    ) -> some View {
+        HStack(spacing: 6) {
+            Circle()
+                .fill(color)
+                .frame(width: 7, height: 7)
+
+            Text(title)
+                .font(.system(size: 10, weight: isActive ? .semibold : .medium, design: .rounded))
+                .foregroundStyle(isActive ? GlazeTheme.textPrimary : GlazeTheme.textMuted)
+
+            Text(threshold)
+                .font(.system(size: 10, weight: .medium, design: .rounded))
+                .foregroundStyle(isActive ? GlazeTheme.textSecondary : GlazeTheme.textMuted)
+                .monospacedDigit()
+        }
+    }
+
+    private func shareColor(for level: BreakShareIndicator.Level) -> Color {
+        switch level {
+        case .warning:
+            return GlazeTheme.signalRed
+        case .caution:
+            return GlazeTheme.accentAmber
+        case .healthy:
+            return GlazeTheme.signalGreen
+        }
     }
 
     private func settingStepper(

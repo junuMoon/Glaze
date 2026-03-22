@@ -40,16 +40,18 @@ Then launch `Glaze.app` from Xcode or from the built product.
 - When the break ends, the next work cycle starts automatically.
 - Opening the menu bar popover does not stall the timer.
 - Saved settings are sanitized on load to the same bounds enforced by the UI steppers.
+- If the Mac stays idle for five minutes during focus or heads-up, the cycle auto-pauses and resumes on return.
+- The popover shows how much break time you have accumulated today and what share of the day that represents so far.
 
 ## Stability Notes
 
 - Multi-display overlay placement has been verified on the built-in display plus one external monitor.
 - The overlay window lifecycle now uses non-destructive hide/show handling instead of closing and recreating windows mid-run-loop teardown.
-- The scheduler now has a small XCTest target covering phase transitions, paused-setting updates, and settings sanitization.
+- The XCTest target now covers scheduler transitions, paused-setting updates, settings sanitization, idle auto-pause policy decisions, and daily break-time accounting.
 
 ## Not in MVP yet
 
-- auto-pause for meetings, media, or idle
+- auto-pause for meetings or media
 - floating countdown near the cursor
 - posture/blink reminders
 - Apple Shortcuts / AppleScript hooks
