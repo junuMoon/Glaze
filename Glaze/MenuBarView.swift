@@ -137,6 +137,7 @@ struct MenuBarView: View {
                     controller.pauseOrResume()
                 }
                 .buttonStyle(GlazePrimaryButtonStyle())
+                .disabled(controller.isMeetingPauseActive)
 
                 Button("Reset Cycle") {
                     controller.resetCycle()

@@ -13,6 +13,8 @@ final class GlazeController: NSObject, ObservableObject {
     private let activityMonitor = ActivityMonitor()
     private let idleTimeProvider: any IdleTimeProviding
     private let idleAutoPausePolicy: IdleAutoPausePolicy
+    private let meetingMonitor: any MeetingStatusProviding
+    private let meetingAutoPausePolicy: MeetingAutoPausePolicy
     private let breakStatsTracker: BreakDailyStatsTracker
 
     private var scheduler: BreakScheduler
@@ -29,11 +31,15 @@ final class GlazeController: NSObject, ObservableObject {
     init(
         idleTimeProvider: any IdleTimeProviding = SystemIdleTimeProvider(),
         idleAutoPausePolicy: IdleAutoPausePolicy = IdleAutoPausePolicy(),
+        meetingMonitor: any MeetingStatusProviding = MeetingMonitor(),
+        meetingAutoPausePolicy: MeetingAutoPausePolicy = MeetingAutoPausePolicy(),
         breakStatsTracker: BreakDailyStatsTracker = BreakDailyStatsTracker()
     ) {
         let now = Date.now
         self.idleTimeProvider = idleTimeProvider
         self.idleAutoPausePolicy = idleAutoPausePolicy
+        self.meetingMonitor = meetingMonitor
+        self.meetingAutoPausePolicy = meetingAutoPausePolicy
         self.breakStatsTracker = breakStatsTracker
         lastBreakAccountingDate = now
         let loadedSettings = Self.loadSettings()
@@ -44,6 +50,7 @@ final class GlazeController: NSObject, ObservableObject {
         configurePopover()
         configureStatusItem()
         configureActivityMonitor()
+        configureMeetingMonitor()
         startTicker()
         refreshUI()
     }
@@ -74,7 +81,11 @@ final class GlazeController: NSObject, ObservableObject {
         case .breaking:
             return "Break Live"
         case .paused:
-            return isAutoPaused ? "Auto-paused" : "Paused"
+            if isMeetingPaused {
+                return "In Meeting"
+            }
+
+            return isIdlePaused ? "Auto-paused" : "Paused"
         }
     }
 
@@ -87,7 +98,11 @@ final class GlazeController: NSObject, ObservableObject {
         case .breaking:
             return "Time to reset"
         case .paused:
-            return isAutoPaused ? "Paused while you're away" : "Hold the rhythm"
+            if isMeetingPaused {
+                return "Time frozen for your meeting"
+            }
+
+            return isIdlePaused ? "Paused while you're away" : "Hold the rhythm"
         }
     }
 
@@ -100,7 +115,11 @@ final class GlazeController: NSObject, ObservableObject {
         case .breaking:
             return "Look away, breathe once, and let the next focus block begin on its own."
         case .paused:
-            if isAutoPaused {
+            if isMeetingPaused {
+                return "The cycle stays paused while a current busy calendar event is underway."
+            }
+
+            if isIdlePaused {
                 return "The cycle stopped after \(idleThresholdText) of idle time and will resume when you come back."
             }
 
@@ -125,7 +144,11 @@ final class GlazeController: NSObject, ObservableObject {
         case .breaking:
             return "Short break"
         case .paused(let resumePhase):
-            if isAutoPaused {
+            if isMeetingPaused {
+                return "Meeting in progress"
+            }
+
+            if isIdlePaused {
                 return "Auto-paused while away"
             }
 
@@ -141,7 +164,7 @@ final class GlazeController: NSObject, ObservableObject {
     }
 
     var autoPauseSummaryText: String {
-        "Auto-pauses after \(idleThresholdText) of idle time during focus or heads-up."
+        "Auto-pauses during busy calendar events, and after \(idleThresholdText) of idle time during focus or heads-up."
     }
 
     var todayBreakDurationText: String {
@@ -165,12 +188,25 @@ final class GlazeController: NSObject, ObservableObject {
     }
 
     var pausedPrimaryActionTitle: String {
-        isAutoPaused ? "Resume Now" : "Resume"
+        if isMeetingPaused {
+            return "Meeting Active"
+        }
+
+        return isIdlePaused ? "Resume Now" : "Resume"
+    }
+
+    var isMeetingPauseActive: Bool {
+        isMeetingPaused
     }
 
     func pauseOrResume() {
         let now = Date.now
         recordBreakTime(until: now)
+
+        if isMeetingPaused, meetingMonitor.isMeetingInProgress(at: now) {
+            refreshUI()
+            return
+        }
 
         switch snapshot.phase {
         case .paused:
@@ -270,6 +306,10 @@ final class GlazeController: NSObject, ObservableObject {
         }
     }
 
+    private func configureMeetingMonitor() {
+        meetingMonitor.start()
+    }
+
     private func startTicker() {
         let timer = DispatchSource.makeTimerSource(queue: .main)
         timer.schedule(deadline: .now() + 1, repeating: 1)
@@ -286,6 +326,7 @@ final class GlazeController: NSObject, ObservableObject {
     private func handleTick() {
         let now = Date.now
         recordBreakTime(until: now)
+        evaluateMeetingAutoPause(now: now)
         evaluateIdleAutoPause(now: now)
         snapshot = scheduler.tick(now: now)
         refreshUI()
@@ -304,6 +345,28 @@ final class GlazeController: NSObject, ObservableObject {
         normalizePauseSource()
         updateStatusItem()
         syncOverlay()
+    }
+
+    private func evaluateMeetingAutoPause(now: Date) {
+        let isMeetingActive = meetingMonitor.isMeetingInProgress(at: now)
+        let action = meetingAutoPausePolicy.action(
+            for: snapshot.phase,
+            pauseSource: pauseSource,
+            isMeetingActive: isMeetingActive
+        )
+
+        switch action {
+        case .pause:
+            snapshot = scheduler.pause(now: now)
+            pauseSource = .meeting
+        case .adoptMeetingPause:
+            pauseSource = .meeting
+        case .resume:
+            snapshot = scheduler.resume(now: now)
+            pauseSource = nil
+        case .none:
+            break
+        }
     }
 
     private func evaluateIdleAutoPause(now: Date) {
@@ -378,7 +441,11 @@ final class GlazeController: NSObject, ObservableObject {
         case .breaking:
             label = shortLabel(for: snapshot.remaining, style: .seconds)
         case .paused:
-            label = isAutoPaused ? "Away" : "Paused"
+            if isMeetingPaused {
+                label = "Meeting"
+            } else {
+                label = isIdlePaused ? "Away" : "Paused"
+            }
         }
 
         button.image = symbolImage(named: phaseSymbolName)
@@ -410,8 +477,12 @@ final class GlazeController: NSObject, ObservableObject {
         return String(format: "%02d:%02d", minutes, seconds)
     }
 
-    private var isAutoPaused: Bool {
+    private var isIdlePaused: Bool {
         pauseSource == .idle
+    }
+
+    private var isMeetingPaused: Bool {
+        pauseSource == .meeting
     }
 
     private var idleThresholdText: String {

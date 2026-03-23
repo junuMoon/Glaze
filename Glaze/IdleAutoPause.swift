@@ -5,6 +5,7 @@ import IOKit.hidsystem
 enum PauseSource: Equatable {
     case manual
     case idle
+    case meeting
 }
 
 enum IdleAutoPauseAction: Equatable {

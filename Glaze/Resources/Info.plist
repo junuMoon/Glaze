@@ -22,6 +22,10 @@
   <string>$(MACOSX_DEPLOYMENT_TARGET)</string>
   <key>LSUIElement</key>
   <true/>
+  <key>NSCalendarsFullAccessUsageDescription</key>
+  <string>Glaze checks your current calendar event so break timers can pause during meetings.</string>
+  <key>NSCalendarsUsageDescription</key>
+  <string>Glaze checks your current calendar event so break timers can pause during meetings.</string>
   <key>NSPrincipalClass</key>
   <string>NSApplication</string>
 </dict>
